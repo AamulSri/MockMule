@@ -1,6 +1,8 @@
 package com.mockmule.userservice.controller;
 
+import com.mockmule.userservice.dto.request.LoginRequest;
 import com.mockmule.userservice.dto.request.RegisterRequest;
+import com.mockmule.userservice.dto.response.LoginResponse;
 import com.mockmule.userservice.dto.response.RegisterResponse;
 import com.mockmule.userservice.entity.User;
 import com.mockmule.userservice.service.UserService;
@@ -28,4 +30,14 @@ public class UserController {
 
     }
 
+    @PostMapping("/login")
+    private ResponseEntity<LoginResponse> loginUser(@Valid @RequestBody LoginRequest loginRequest) {
+        LoginResponse response = userService.login(loginRequest);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/test-auth")
+    public String testAuth() {
+        return "JWT Authentication successful!";
+    }
 }
