@@ -2,6 +2,7 @@ package com.mockmule.userservice.controller;
 
 import com.mockmule.userservice.dto.request.LoginRequest;
 import com.mockmule.userservice.dto.request.RegisterRequest;
+import com.mockmule.userservice.dto.response.ApiResponse;
 import com.mockmule.userservice.dto.response.LoginResponse;
 import com.mockmule.userservice.dto.response.RegisterResponse;
 import com.mockmule.userservice.entity.User;
@@ -23,21 +24,27 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    private ResponseEntity<RegisterResponse> registerUser(@Valid @RequestBody RegisterRequest registerRequest)
+    private ResponseEntity<ApiResponse<RegisterResponse>> registerUser(@Valid @RequestBody RegisterRequest registerRequest)
     {
         RegisterResponse response = userService.register(registerRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+
+        ApiResponse<RegisterResponse> apiResponse = new ApiResponse<>(
+                true,
+                "User registered successfully",
+                response
+        );
+        return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
 
     }
 
     @PostMapping("/login")
-    private ResponseEntity<LoginResponse> loginUser(@Valid @RequestBody LoginRequest loginRequest) {
+    private ResponseEntity<ApiResponse<LoginResponse>> loginUser(@Valid @RequestBody LoginRequest loginRequest) {
         LoginResponse response = userService.login(loginRequest);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
-
-    @GetMapping("/test-auth")
-    public String testAuth() {
-        return "JWT Authentication successful!";
+        ApiResponse<LoginResponse> apiResponse = new ApiResponse<>(
+                true,
+                "User Logged in Scussessfully",
+                response
+        );
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
 }

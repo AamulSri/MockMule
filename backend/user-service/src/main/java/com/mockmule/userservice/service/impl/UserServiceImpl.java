@@ -5,11 +5,15 @@ import com.mockmule.userservice.dto.request.RegisterRequest;
 import com.mockmule.userservice.dto.response.LoginResponse;
 import com.mockmule.userservice.dto.response.RegisterResponse;
 import com.mockmule.userservice.entity.User;
+import com.mockmule.userservice.exception.InvalidCredentialsException;
+import com.mockmule.userservice.exception.UserAlreadyExistsException;
 import com.mockmule.userservice.repository.UserRepository;
 import com.mockmule.userservice.service.JwtService;
 import com.mockmule.userservice.service.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -27,16 +31,19 @@ public class UserServiceImpl implements UserService {
     @Override
     public RegisterResponse register(RegisterRequest registerRequest){
 
-        if(userRepository.existsByEmail(registerRequest.getEmail())){
-            throw new RuntimeException("Email already exists");
+        String email = registerRequest.getEmail().trim();
+        String username = registerRequest.getUsername().trim();
+
+        if(userRepository.existsByEmail(email)){
+            throw new UserAlreadyExistsException("Email already exists");
         }
-        if(userRepository.existsByUsername(registerRequest.getUsername())){
-            throw new RuntimeException("Username already exists");
+        if(userRepository.existsByUsername(username)){
+            throw new UserAlreadyExistsException("Username already exists");
         }
 
         User user = new User();
-        user.setEmail(registerRequest.getEmail());
-        user.setUsername(registerRequest.getUsername());
+        user.setEmail(email);
+        user.setUsername(username);
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
 
         User savedUser = userRepository.save(user);
@@ -52,14 +59,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public LoginResponse login(LoginRequest loginRequest) {
         // Implementation for login logic
-        String email = loginRequest.getEmail();
+        String email = loginRequest.getEmail().trim();
         User user = userRepository.findByEmail(email).
-                orElseThrow(()-> new RuntimeException("User Not Found with email:"+email));
+                orElseThrow(()-> new InvalidCredentialsException("User Not Found with email:"+email));
 
         boolean passwordMatcher = passwordEncoder.matches(loginRequest.getPassword(), user.getPassword());
 
         if(!passwordMatcher){
-            throw new RuntimeException("Invalid Password");
+            throw new InvalidCredentialsException("Invalid Password");
         }
         return new LoginResponse(
                 user.getId(),
@@ -69,7 +76,5 @@ public class UserServiceImpl implements UserService {
                 "User logged in successfully"
         );
     }
-
-
 
 }
