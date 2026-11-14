@@ -1,4 +1,4 @@
-package entity;
+package com.mockmule.profile_service.entity;
 
 import jakarta.persistence.*;
 
