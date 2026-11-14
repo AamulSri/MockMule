@@ -15,7 +15,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(UserAlreadyExistsException.class)
     public ResponseEntity<ApiResponse<Void>> handleUserAlreadyExistsException(UserAlreadyExistsException exception){
-        ApiResponse<Void> response = new ApiResponse(
+        ApiResponse<Void> response = new ApiResponse<>(
                 false,
                 exception.getMessage(),
                 null

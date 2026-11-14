@@ -12,8 +12,6 @@ import com.mockmule.userservice.service.JwtService;
 import com.mockmule.userservice.service.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -35,7 +33,7 @@ public class UserServiceImpl implements UserService {
         String username = registerRequest.getUsername().trim();
 
         if(userRepository.existsByEmail(email)){
-            throw new UserAlreadyExistsException("Email already exists");
+            throw new UserAlreadyExistsException("Email already registered");
         }
         if(userRepository.existsByUsername(username)){
             throw new UserAlreadyExistsException("Username already exists");
@@ -60,13 +58,13 @@ public class UserServiceImpl implements UserService {
     public LoginResponse login(LoginRequest loginRequest) {
         // Implementation for login logic
         String email = loginRequest.getEmail().trim();
-        User user = userRepository.findByEmail(email).
-                orElseThrow(()-> new InvalidCredentialsException("User Not Found with email:"+email));
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new InvalidCredentialsException("Invalid email or password"));
 
         boolean passwordMatcher = passwordEncoder.matches(loginRequest.getPassword(), user.getPassword());
 
         if(!passwordMatcher){
-            throw new InvalidCredentialsException("Invalid Password");
+            throw new InvalidCredentialsException("Invalid email or password");
         }
         return new LoginResponse(
                 user.getId(),
