@@ -1,46 +1,55 @@
 package com.mockmule.profile_service.service.impl;
 
+import com.mockmule.profile_service.dto.CreateProfileRequest;
+import com.mockmule.profile_service.dto.ProfileResponse;
+import com.mockmule.profile_service.dto.UpdateProfileRequest;
 import com.mockmule.profile_service.entity.Profile;
+import com.mockmule.profile_service.exception.DuplicateResourceException;
+import com.mockmule.profile_service.exception.ResourceNotFoundException;
+import com.mockmule.profile_service.mapper.ProfileMapper;
 import com.mockmule.profile_service.repository.ProfileRepository;
 import com.mockmule.profile_service.service.ProfileService;
+import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+@Service
 public class ProfileServiceImpl implements ProfileService {
 
     private final ProfileRepository profileRepository;
+    private final ProfileMapper profileMapper;
 
-    public ProfileServiceImpl(ProfileRepository profileRepository) {
+    public ProfileServiceImpl(ProfileRepository profileRepository, ProfileMapper profileMapper) {
         this.profileRepository = profileRepository;
+        this.profileMapper = profileMapper;
     }
 
     @Override
-    public Profile createProfile(Profile profile){
+    public ProfileResponse createProfile(Long userId , CreateProfileRequest request){
 
-        if (profileRepository.existsByUserId(profile.getUserId())) {
-            throw new IllegalStateException("Profile already exists for this userId: " + profile.getUserId());
+        if (profileRepository.existsByUserId(userId)){
+            throw new DuplicateResourceException("Profile already exists for this userId: " + userId);
         }
-        return profileRepository.save(profile);
-    }
-    @Override
-    public  Optional<Profile> getProfileByUserId(Long userId){
-
-        return profileRepository.findByUserId(userId);
+        Profile profile = profileMapper.toEntity(request,userId);
+        return profileMapper.toResponse(profileRepository.save(profile));
 
     }
     @Override
-    public Profile updateProfile(Long userId, Profile profile){
+    public ProfileResponse getProfileByUserId(Long userId){
+
+        Profile profile = profileRepository.findByUserId(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Profile not found for userId: " + userId));
+        return profileMapper.toResponse(profile);
+    }
+
+    @Override
+    public ProfileResponse updateProfile(Long userId, UpdateProfileRequest request){
 
         Profile existingProfile = profileRepository.findByUserId(userId)
-                .orElseThrow(() -> new IllegalStateException("Profile not found for userId: " + userId));
+                .orElseThrow(() -> new ResourceNotFoundException("Profile not found for userId: " + userId));
 
-        existingProfile.setFullName(profile.getFullName());
-        existingProfile.setLocation(profile.getLocation());
-        existingProfile.setPhoneNumber(profile.getPhoneNumber());
-        existingProfile.setHeadline(profile.getHeadline());
-        existingProfile.setSummary(profile.getSummary());
+        profileMapper.updateEntity(existingProfile , request);
 
-        return profileRepository.save(existingProfile);
-
+        return profileMapper.toResponse(profileRepository.save(existingProfile));
     }
 }
