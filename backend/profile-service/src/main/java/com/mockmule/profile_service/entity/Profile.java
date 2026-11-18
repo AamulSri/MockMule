@@ -3,6 +3,8 @@ package com.mockmule.profile_service.entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "profiles")
@@ -11,6 +13,13 @@ public class Profile {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @OneToMany(
+            mappedBy = "profile",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<Resume> resume = new ArrayList<>();
 
     @Column(nullable = false , unique = true)
     private Long userId;
@@ -37,14 +46,20 @@ public class Profile {
         updatedAt = LocalDateTime.now();
     }
 
-
-    // getters and setters
     public Long getId() {
         return id;
     }
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public List<Resume> getResume() {
+        return resume;
+    }
+
+    public void setResume(List<Resume> resume) {
+        this.resume = resume;
     }
 
     public Long getUserId() {

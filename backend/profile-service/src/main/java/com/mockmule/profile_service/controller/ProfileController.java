@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("api/v1/profle")
+@RequestMapping("api/v1/profile")
 public class ProfileController {
     private final ProfileService profileService;
 
