@@ -1,5 +1,6 @@
 package com.mockmule.userservice.entity;
 
+import com.mockmule.userservice.enums.UserRole;
 import jakarta.persistence.*;
 
 
@@ -18,6 +19,10 @@ private String email;
 
 @Column(name = "password", nullable = false)
 private String password;
+
+@Enumerated(EnumType.STRING)
+@Column(nullable = false)
+private UserRole role = UserRole.USER;
 
     public long getId() {
         return id;
@@ -49,5 +54,13 @@ private String password;
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public UserRole getRole() {
+        return role;
+    }
+
+    public void setRole(UserRole role) {
+        this.role = role;
     }
 }
