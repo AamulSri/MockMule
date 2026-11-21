@@ -37,7 +37,7 @@ public class Resume {
     private ResumeParsingStatus parsingStatus = ResumeParsingStatus.UPLOADED;
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime uploadeddAt;
+    private LocalDateTime uploadedAt;
 
     @Column(nullable = false)
     private LocalDateTime updateAt;
@@ -48,7 +48,7 @@ public class Resume {
     @PrePersist
     protected void onCreate(){
         LocalDateTime now = LocalDateTime.now();
-        uploadeddAt = now;
+        uploadedAt = now;
         updateAt= now;
     }
 
@@ -105,12 +105,12 @@ public class Resume {
         this.parsingStatus = parsingStatus;
     }
 
-    public LocalDateTime getUploadeddAt() {
-        return uploadeddAt;
+    public LocalDateTime getUploadedAt() {
+        return uploadedAt;
     }
 
-    public void setUploadeddAt(LocalDateTime uploadeddAt) {
-        this.uploadeddAt = uploadeddAt;
+    public void setUploadedAt(LocalDateTime uploadedAt) {
+        this.uploadedAt = uploadedAt;
     }
 
     public LocalDateTime getUpdateAt() {
