@@ -1,0 +1,46 @@
+
+services:
+
+  postgres:
+    image: postgres:17
+    container_name: mockmule-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: mockmule
+      POSTGRES_USER: mockmule_user
+      POSTGRES_PASSWORD: mockmule_local_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mockmule_user -d mockmule"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mongodb:
+    image: mongo:8
+    container_name: mockmule-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mockmule_admin
+      MONGO_INITDB_ROOT_PASSWORD: mockmule_local_password
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    healthcheck:
+      test:
+        - CMD
+        - mongosh
+        - --quiet
+        - --eval
+        - "db.adminCommand('ping').ok"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+  mongodb_data:

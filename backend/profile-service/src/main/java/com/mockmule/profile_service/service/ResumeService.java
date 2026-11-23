@@ -10,4 +10,5 @@ public interface ResumeService {
     ResumeResponse uploadResume(Long profileId, MultipartFile file);
     List<ResumeResponse> getResumesByProfileId(Long profileId);
     Resource downloadResume(Long profileId, Long resumeId);
+    void deleteResume(Long profileId, Long resumeId);
 }
