@@ -8,7 +8,13 @@ import java.util.Optional;
 
 public interface ResumeRepository extends JpaRepository<Resume,Long > {
 
-    List<Resume> findByProfileId(Long profileId);
-    Optional<Resume> findByIdAndProfileId(Long resumeId, Long profileId);
+
+    List<Resume> findByProfileIdAndDeleteFalse(Long profileId);
+
+    Optional<Resume> findByProfileIdAndIdAndDeleteFalse(
+            Long profileId,
+            Long resumeId
+    );
+
     boolean existsByStorageKey(String storageKey);
 }

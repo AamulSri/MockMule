@@ -45,6 +45,11 @@ public class Resume {
     @Column(nullable = false, unique = true, length = 500)
     private String storageKey;
 
+    @Column(nullable = false)
+    private boolean delete = false;
+
+    private LocalDateTime deletedAt;
+
     @PrePersist
     protected void onCreate(){
         LocalDateTime now = LocalDateTime.now();
@@ -127,5 +132,21 @@ public class Resume {
 
     public void setStorageKey(String storageKey) {
         this.storageKey = storageKey;
+    }
+
+    public boolean isDelete() {
+        return delete;
+    }
+
+    public void setDelete(boolean delete) {
+        this.delete = delete;
+    }
+
+    public LocalDateTime getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
     }
 }

@@ -15,7 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@RequestMapping("/api/v1/profile")
+@RequestMapping("/api/v1/profile/{profileId}")
 @RestController
 public class ResumeController {
 
@@ -26,7 +26,7 @@ public class ResumeController {
     }
 
 
-    @GetMapping("/{profileId}/getResumes")
+    @GetMapping("/getResumes")
     public ResponseEntity<ApiResponse<List<ResumeResponse>>> getResumesByProfileId(@PathVariable Long profileId){
 
         List<ResumeResponse> resumeResponse = resumeService.getResumesByProfileId(profileId);
@@ -42,7 +42,7 @@ public class ResumeController {
         return ResponseEntity.ok(apiResponse);
     }
 
-    @PostMapping("/{profileId}/resumes")
+    @PostMapping("/resumes")
     public ResponseEntity<ApiResponse<ResumeResponse>> uploadResume(
             @PathVariable Long profileId , @RequestParam("file") MultipartFile file){
 
@@ -59,7 +59,7 @@ public class ResumeController {
         return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
     }
 
-    @GetMapping("/{profileId}/download/{resumeId}")
+    @GetMapping("/download/{resumeId}")
     public ResponseEntity<Resource> downloadResume(@PathVariable Long profileId ,
                                                                 @PathVariable Long resumeId){
 
@@ -72,5 +72,20 @@ public class ResumeController {
                         "attachment; filename=\"" + resource.getFilename() + "\""
                 )
                 .body(resource);
+    }
+
+    @DeleteMapping("/delete/{resumeId}")
+    public ResponseEntity<ApiResponse<Void>> deleteResume(@PathVariable Long profileId,
+                                                          @PathVariable Long resumeId){
+
+        resumeService.deleteResume(profileId,resumeId);
+        ApiResponse<Void> response = new ApiResponse<>(
+                LocalDateTime.now(),
+                HttpStatus.OK.value(),
+                "Deleted Resume Successfully",
+                null,
+                null
+        );
+        return ResponseEntity.ok(response);
     }
 }

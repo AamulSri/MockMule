@@ -4,6 +4,7 @@ import com.mockmule.profile_service.dto.ResumeResponse;
 import com.mockmule.profile_service.entity.Profile;
 import com.mockmule.profile_service.entity.Resume;
 import com.mockmule.profile_service.enums.ResumeParsingStatus;
+import com.mockmule.profile_service.exception.ResourceNotFoundException;
 import com.mockmule.profile_service.mapper.ResumeMapper;
 import com.mockmule.profile_service.repository.ProfileRepository;
 import com.mockmule.profile_service.repository.ResumeRepository;
@@ -14,6 +15,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -68,7 +70,7 @@ public class ResumeServiceImpl implements ResumeService {
         if(!profileRepository.existsById(profileId)){
             throw new RuntimeException("Profile doesn't exists with id "+ profileId);
         }
-        List<Resume> resumesByProfileId = resumeRepository.findByProfileId(profileId);
+        List<Resume> resumesByProfileId = resumeRepository.findByProfileIdAndDeleteFalse(profileId);
 
         return resumesByProfileId.stream().map(resumeMapper::toResponse).toList();
 
@@ -80,10 +82,28 @@ public class ResumeServiceImpl implements ResumeService {
         if(!profileRepository.existsById(profileId)){
             throw new RuntimeException("Profile doesn't exists with id "+ profileId);
         }
-        Resume resumes = resumeRepository.findByIdAndProfileId(resumeId, profileId)
+        Resume resumes = resumeRepository.findByProfileIdAndIdAndDeleteFalse(profileId, resumeId)
                 .orElseThrow(()-> new RuntimeException("Resume not found with ResumeId "+ resumeId));
 
         return fileStorageService.loadFile(resumes.getStorageKey());
     }
 
+
+    @Override
+    @Transactional
+    public void deleteResume(Long profileId, Long resumeId){
+
+        if(!profileRepository.existsById(profileId)){
+            throw new ResourceNotFoundException("Profile doesn't exists with id"+ profileId);
+        }
+
+        Resume resume = resumeRepository.findByProfileIdAndIdAndDeleteFalse(profileId, resumeId)
+                .orElseThrow(()->new ResourceNotFoundException("Resume Doesn't Exists with " +
+                        "profileId : "+profileId+ " and resumeId: " + resumeId));
+
+        resume.setDelete(true);
+        resume.setDeletedAt(LocalDateTime.now());
+
+        resumeRepository.save(resume);
+    }
 }
