@@ -1,0 +1,152 @@
+package com.mockmule.profile_service.entity;
+
+
+import com.mockmule.profile_service.enums.ResumeParsingStatus;
+import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Table(
+    name ="resumes",
+    indexes = {
+        @Index(name = "idx_resume_profile_id", columnList = "profile_id")
+        }
+)
+
+public class Resume {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name ="profile_id", nullable = false)
+    private Profile profile;
+
+    @Column(nullable = false , length = 255)
+    private String fileName;
+
+    @Column(nullable = false, length =20)
+    private String fileType;
+
+    @Column(nullable = false)
+    private Long fileSize;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false , length = 20)
+    private ResumeParsingStatus parsingStatus = ResumeParsingStatus.UPLOADED;
+
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime uploadedAt;
+
+    @Column(nullable = false)
+    private LocalDateTime updateAt;
+
+    @Column(nullable = false, unique = true, length = 500)
+    private String storageKey;
+
+    @Column(nullable = false)
+    private boolean delete = false;
+
+    private LocalDateTime deletedAt;
+
+    @PrePersist
+    protected void onCreate(){
+        LocalDateTime now = LocalDateTime.now();
+        uploadedAt = now;
+        updateAt= now;
+    }
+
+    @PostUpdate
+    protected void onUpdate(){
+        updateAt = LocalDateTime.now();
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Profile getProfile() {
+        return profile;
+    }
+
+    public void setProfile(Profile profile) {
+        this.profile = profile;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public String getFileType() {
+        return fileType;
+    }
+
+    public void setFileType(String fileType) {
+        this.fileType = fileType;
+    }
+
+    public Long getFileSize() {
+        return fileSize;
+    }
+
+    public void setFileSize(Long fileSize) {
+        this.fileSize = fileSize;
+    }
+
+    public ResumeParsingStatus getParsingStatus() {
+        return parsingStatus;
+    }
+
+    public void setParsingStatus(ResumeParsingStatus parsingStatus) {
+        this.parsingStatus = parsingStatus;
+    }
+
+    public LocalDateTime getUploadedAt() {
+        return uploadedAt;
+    }
+
+    public void setUploadedAt(LocalDateTime uploadedAt) {
+        this.uploadedAt = uploadedAt;
+    }
+
+    public LocalDateTime getUpdateAt() {
+        return updateAt;
+    }
+
+    public void setUpdateAt(LocalDateTime updateAt) {
+        this.updateAt = updateAt;
+    }
+
+    public String getStorageKey() {
+        return storageKey;
+    }
+
+    public void setStorageKey(String storageKey) {
+        this.storageKey = storageKey;
+    }
+
+    public boolean isDelete() {
+        return delete;
+    }
+
+    public void setDelete(boolean delete) {
+        this.delete = delete;
+    }
+
+    public LocalDateTime getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
+    }
+}
